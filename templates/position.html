@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_2 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>    
+    
+            <div class="folium-map" id="map_2" ></div>
+        
+</body>
+<script>    
+    
+            var map_2 = L.map(
+                "map_2",
+                {
+                    center: [37.40186309814453, 126.71006266276042],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 12,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_f5dbd8639dd3b50fca17b50f562be68a = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_2);
+        
+    
+            var marker_e9e638cd04e84de061b588bb76af31a2 = L.marker(
+                [37.40186309814453, 126.71006266276042],
+                {}
+            ).addTo(map_2);
+        
+    
+            var icon_67c52015dff07e66807966864241e405 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "star", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_e9e638cd04e84de061b588bb76af31a2.setIcon(icon_67c52015dff07e66807966864241e405);
+        
+    
+        var popup_66e117bfeee1b484bab3addf5161c4a6 = L.popup({"maxWidth": "100%"});
+
+        
+            var i_frame_ff7a6d7b373516bc1c2ed8c276125c32 = $(`<iframe src="data:text/html;charset=utf-8;base64,CiAgICA8aDU+dzN3IC8vLyDqs7zsl7Au65ag64KcLuydvOq1kOywqDxoNT48aHIgY2xhc3M9J29uZSc+PGg1PuydtCDsnqXshozsnZgg64yA7ZGcIO2CpOybjOuTnOuKlCA8aDU+PGgzPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO+yEuOyblO2YuDxoMz48aDU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO+yeheuLiOuLpC48aDU+" width="200" style="border:none !important;" height="200"></iframe>`)[0];
+            popup_66e117bfeee1b484bab3addf5161c4a6.setContent(i_frame_ff7a6d7b373516bc1c2ed8c276125c32);
+        
+
+        marker_e9e638cd04e84de061b588bb76af31a2.bindPopup(popup_66e117bfeee1b484bab3addf5161c4a6)
+        ;
+
+        
+    
+    
+            marker_e9e638cd04e84de061b588bb76af31a2.bindTooltip(
+                `<div>
+                     키워드
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_fd3fbbbc5b8fe7487421273dcc658c6a = L.marker(
+                [37.40180587768555, 126.71184539794922],
+                {}
+            ).addTo(map_2);
+        
+    
+            marker_fd3fbbbc5b8fe7487421273dcc658c6a.bindTooltip(
+                `<div>
+                     인천남동우체국
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_11692b828dbbf09f82841295827e4aec = L.marker(
+                [37.4019660949707, 126.70919036865234],
+                {}
+            ).addTo(map_2);
+        
+    
+            marker_11692b828dbbf09f82841295827e4aec.bindTooltip(
+                `<div>
+                     호구포역정류장
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_c4b0d12f088e2b1841f9d2464c6d4426 = L.marker(
+                [37.401817321777344, 126.70915222167969],
+                {}
+            ).addTo(map_2);
+        
+    
+            marker_c4b0d12f088e2b1841f9d2464c6d4426.bindTooltip(
+                `<div>
+                     호텔라르시티입구
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var circle_3ad0eea1c635194531e5034eeee6f452 = L.circle(
+                [37.40186309814453, 126.71006266276042],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": "red", "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 178.3653255064642, "stroke": true, "weight": 3}
+            ).addTo(map_2);
+        
+</script>

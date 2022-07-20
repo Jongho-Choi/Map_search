@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <title> Explore unknown places </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+    <link rel="stylesheet" href="../static/fonts/icomoon/style.css">
+    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <!-- Style -->
+    <link rel="stylesheet" href="../static/css/style.css">
+
+    <script>
+        L_NO_TOUCH = false;
+        L_DISABLE_3D = false;
+    </script>
+
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position: absolute;top: 0;bottom: 0;right: 0;left: 0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css" />
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" /> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css" />
+
+    <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <style>
+        #map_2 {
+            position: relative;
+            width: 90.0%;
+            height: 80.0%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #position {
+            margin-left: left;
+            margin-right: auto;
+        } 
+        body { background-color: #fff8f8; }
+    </style>
+</head>
+
+<body >
+    <div class="site-mobile-menu site-navbar-target">
+        <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close mt-3">
+                <span class="icon-close2 js-menu-toggle"></span>
+            </div>
+        </div>
+        <div class="site-mobile-menu-body"></div>
+    </div>
+
+    <header class="site-navbar site-navbar-target py-4" role="banner">
+
+        <div class="container">
+            <div class="row align-items-center position-relative">
+
+                <div class="col-3">
+                    <div class="site-logo">
+                        <a href="/" class="font-weight-bold text-black">Brand</a>
+                    </div>
+                </div>
+
+                <div class="col-9  text-right">
+                    <span class="d-inline-block d-lg-block">
+                        <a href="#" class="text-black site-menu-toggle js-menu-toggle py-5">
+                        <span class="icon-menu h3 text-black"></span>
+                        </a>
+                    </span>
+
+                    <nav class="site-navigation text-right ml-auto d-none d-lg-none" role="navigation">
+                        <ul class="site-menu main-menu js-clone-nav ml-auto ">
+                        <li class="active"><a href="/" class="nav-link">Home</a></li>
+                        <li><a href="/about" class="nav-link">About</a></li>
+                        <li><a href="/services" class="nav-link">Services</a></li>
+                        <li><a href="/contact" class="nav-link">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <br><br><br>
+
+    <div class="folium-map" id="map_2"> {{ map | safe }} <!-- map html --></div>
+    
+    <section class="position">
+        <form action="/position" method="post" class="input-form">
+            <style>
+                table, td {margin-left: auto;margin-right: auto;text-align: center;}
+            </style>
+            <table>
+                <td><input type="text" name="id_1" placeholder="{{place1}}" class="form-control" aria-label="Search"/></td>
+                <td><input type="text" name="id_2" placeholder="{{place2}}" class="form-control" aria-label="Search"/></td>
+                <td><input type="text" name="id_3" placeholder="{{place3}}" class="form-control" aria-label="Search"/></td>
+                <br>
+                <td><input type="submit" value="  검 색  " class="input-btn"></td>
+            </table>
+        </form>
+    </section>
+    
+    <script src="../static/js/jquery-3.3.1.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.sticky.js"></script>
+    <script src="../static/js/main.js"></script>
+</body>
+
+</html>

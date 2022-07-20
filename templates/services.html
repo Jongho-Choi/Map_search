@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title> Explore unknown places </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+    <link rel="stylesheet" href="../static/fonts/icomoon/style.css">
+    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <!-- Style -->
+    <link rel="stylesheet" href="../static/css/style.css">
+    
+    <script>
+        L_NO_TOUCH = false;
+        L_DISABLE_3D = false;
+    </script>
+
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>
+        body { background-color: #fff8f8; }
+        .sns-go {text-align:center; padding: 0 0;}
+        .sns-go li {text-align:center; display:inline-block; 
+            margin-left: 10px; }
+        .sns-go li img {border-radius:50%;}	
+    </style>
+    <!-- KaKaoTalk -->
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+    <script>
+        Kakao.init('7c7026643ba0ce5fa7bb5aa38b1e4fdf');
+        Kakao.isInitialized();
+    </script>
+    
+</head>
+
+<body>
+    <div class="site-mobile-menu site-navbar-target">
+        <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close mt-3">
+                <span class="icon-close2 js-menu-toggle"></span>
+            </div>
+        </div>
+        <div class="site-mobile-menu-body"></div>
+    </div>
+
+    <header class="site-navbar site-navbar-target py-4" role="banner">
+
+        <div class="container">
+            <div class="row align-items-center position-relative">
+
+                <div class="col-3">
+                    <div class="site-logo">
+                        <a href="/" class="font-weight-bold text-black">Brand</a>
+                    </div>
+                </div>
+
+                <div class="col-9  text-right">
+                    <span class="d-inline-block d-lg-block">
+                        <a href="#" class="text-black site-menu-toggle js-menu-toggle py-5">
+                        <span class="icon-menu h3 text-black"></span>
+                        </a>
+                    </span>
+
+                    <nav class="site-navigation text-right ml-auto d-none d-lg-none" role="navigation">
+                        <ul class="site-menu main-menu js-clone-nav ml-auto ">
+                        <li class="active"><a href="/" class="nav-link">Home</a></li>
+                        <li><a href="/about" class="nav-link">About</a></li>
+                        <li><a href="/services" class="nav-link">Services</a></li>
+                        <li><a href="/contact" class="nav-link">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <br><br><br>
+    <div class="row d-flex justify-content-center">
+        <div class= 'd-flex justify-content-center align-items-center' style="height: 80vh;">
+            <div class="container-fluid-center">
+
+                <h3 class="text-center text-black">공유하기</h3>
+                <br><br>
+                <div class="sns-go">
+                        <li>
+                            <a href="#" onclick="javascript:window.open('https://www.facebook.com/sharer/sharer.php?u=' +encodeURIComponent(document.URL)+'&t='+encodeURIComponent(document.title), 'facebooksharedialog', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" 
+                               target="_blank" 
+                               alt="Share on Facebook">
+                            <img src="../static/images/sns_face.png" width="50" alt="페이스북 공유하기"></a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="javascript:window.open('https://twitter.com/intent/tweet?text=[%EA%B3%B5%EC%9C%A0]%20' +encodeURIComponent(document.URL)+'%20-%20'+encodeURIComponent(document.title), 'twittersharedialog', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" 
+                               target="_blank" 
+                               alt="Share on Twitter">
+                            <img src="../static/images/sns_tw.png" width="50" alt="트위터 공유하기"></a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="javascript:window.open('https://story.kakao.com/s/share?url=' +encodeURIComponent(document.URL), 'kakaostorysharedialog', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes, height=400,width=600');return false;" 
+                               target="_blank" 
+                               alt="Share on kakaostory">
+                            <img src="../static/images/sns_kakao.png" width="50" alt="카카오스토리 공유하기"></a>
+                        </li>
+                        <li>
+                            <a id="create-kakaotalk-sharing-btn" href="javascript:;">
+                            <img src="../static/images/sns_ka.png" width="50" alt="카카오톡 공유하기"/></a>
+                            <script type="text/javascript">
+                                Kakao.Share.createDefaultButton({
+                                    container: '#create-kakaotalk-sharing-btn',
+                                    objectType: 'feed',
+                                    content: {
+                                        title: '위치검색',
+                                        description: '원하는 장소를 검색해봐',
+                                        // imageUrl:
+                                        // 'http://localhost:5000/static/images/main.png',
+                                        link: {
+                                            mobileWebUrl: 'http://mapsearchcp2.appspot.com/',
+                                            webUrl: 'http://mapsearchcp2.appspot.com/',
+                                        },
+                                    },
+                                    buttons: [{
+                                        title: '웹으로 보기',
+                                        link: {
+                                            mobileWebUrl: 'http://mapsearchcp2.appspot.com/',
+                                            webUrl: 'http://mapsearchcp2.appspot.com/',
+                                        },},
+                                        {
+                                        title: '앱으로 보기',
+                                        link: {
+                                            mobileWebUrl: 'http://mapsearchcp2.appspot.com/',
+                                            webUrl: 'http://mapsearchcp2.appspot.com/',
+                                        },}
+                                    ],
+                                })
+                            </script>  
+                        </li>
+                </div>
+                <br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="../static/js/jquery-3.3.1.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.sticky.js"></script>
+    <script src="../static/js/main.js"></script>
+</body>
+
+</html>
