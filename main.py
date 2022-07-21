@@ -125,4 +125,4 @@ def map():
         return 'html을 불러올수 없습니다.', 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=8080)
