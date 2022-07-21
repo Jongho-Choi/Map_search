@@ -36,6 +36,11 @@ def contact():
 
     return render_template('contact.html'),200
 
+@app.route('/thanks')
+def thanks():
+
+    return render_template('thankyou.html'),200
+
 @app.route('/position', methods=['GET', 'POST'])
 def map():
     try:
@@ -58,7 +63,6 @@ def map():
                 B, B_status = info(place2, key, url)
                 if B_status != 'OK':
                     return render_template('error.html', text = '', place = place2), 400
-
                 C, C_status = info(place3, key, url) ## 검색이 안될경우 status = 'NOT_FOUND'
                 if C_status != 'OK':
                     return render_template('error.html', text = '', place = place3), 400

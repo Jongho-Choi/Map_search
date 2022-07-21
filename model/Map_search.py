@@ -4,7 +4,7 @@ import numpy as np
 from scipy import spatial
 import folium
 from folium import plugins
-import os
+import os, time
 
 ## Vworld맵에서 지역 정보 저장
 ## 각 장소별 특성 및 상태 반환
@@ -35,6 +35,7 @@ def total_position(place, key, url, pages, size=1000):
             x     = places['response']['result']['items'][j]['point']['x']
             y     = places['response']['result']['items'][j]['point']['y']
             data = np.append(data, [[x, y, title]], axis=0)
+        time.sleep(0.05)
     return data
 
 ## 1. 제일 수가 적은 지역 찾고 
