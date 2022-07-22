@@ -5,23 +5,25 @@ entrypoint: gunicorn -b :$PORT main:app
 runtime_config:
  python_version: 3.7
 
-manual_scaling:
-  instances : 2
+automatic_scaling:
+  min_num_instances: 3
+  max_num_instances: 10
+  cool_down_period_sec: 180
+  cpu_utilization:
+    target_utilization: 0.6
 
 resources:
   cpu: 2
-  memory_gb: 8
-  disk_size_gb: 30
+  memory_gb: 10
+  disk_size_gb: 40
 
 liveness_check:
   path: "/liveness_check"
-  check_interval_sec: 60
-  timeout_sec: 55
-  failure_threshold: 3
-  success_threshold: 3
-
-  
-
+  check_interval_sec: 300
+  timeout_sec: 100
+  failure_threshold: 10
+  success_threshold: 10
+ 
 # runtime: python
 # env: flex
 # entrypoint: gunicorn -b :$PORT main:app
@@ -36,6 +38,13 @@ liveness_check:
 #   cpu: 2
 #   memory_gb: 3
 #   disk_size_gb: 10
+
+# automatic_scaling:
+#   min_num_instances: 3 # 지연 시간을 줄이기 위한 기본값은 2
+#   max_num_instances: 10
+#   cool_down_period_sec: 180
+#   cpu_utilization:
+#     target_utilization: 0.6
 
 # liveness_check:
 #   path: "/liveness_check"

@@ -41,58 +41,57 @@ def total_position(place, key, url, pages, size=1000):
 ## 1. 제일 수가 적은 지역 찾고 
 ## 2. A, B, C(제일 적은 수) 재배치
 
-def small_num_of_places(A,B,C,search_names):
-    len_a = len(A)
-    len_b = len(B)
-    len_c = len(C)
+def small_num_of_places(A_place,B_place,C_place,search_names):
+    len_a = len(A_place)
+    len_b = len(B_place)
+    len_c = len(C_place)
     if (len_a <= len_b) and (len_a <= len_c):
-        return B, C, A, [search_names[1], search_names[2], search_names[0]]
+        return B_place, C_place, A_place, [search_names[1], search_names[2], search_names[0]]
     elif (len_b <= len_a) and (len_a <= len_c):
-        return A, C, B, [search_names[0], search_names[2], search_names[1]]
+        return A_place, C_place, B_place, [search_names[0], search_names[2], search_names[1]]
     else:
-        return A, B, C, search_names
+        return A_place, B_place, C_place, search_names
 
 ## 3. C를 기준으로 가장 가까운 A,B 지역 탐색
-def find_nearest(A, B, C):
+def find_nearest(A_place, B_place, C_place):
     ## A-C 최근접 찾기
-    AC = np.empty((0,3), int)
-    BC = np.empty((0,3), int)
-    treeA = spatial.KDTree(A[:, :2].astype(np.float32))
-    treeB = spatial.KDTree(B[:, :2].astype(np.float32))
-    for C_value in C[:, :2].astype(np.float32):
-        temp_AC = A[ treeA.query([C_value])[1] ]
-        temp_BC = B[ treeB.query([C_value])[1] ]
-        AC = np.append(AC, temp_AC, axis=0)
-        BC = np.append(BC, temp_BC, axis=0)
-
-    return AC, BC, C
+    AC_place = np.empty((0,3), int)
+    BC_place = np.empty((0,3), int)
+    treeA = spatial.KDTree(A_place[:, :2].astype(np.float32))
+    treeB = spatial.KDTree(B_place[:, :2].astype(np.float32))
+    for C_value in C_place[:, :2].astype(np.float32):
+        temp_AC = A_place[ treeA.query([C_value])[1] ]
+        temp_BC = B_place[ treeB.query([C_value])[1] ]
+        AC_place = np.append(AC_place, temp_AC, axis=0)
+        BC_place = np.append(BC_place, temp_BC, axis=0)
+    return AC_place, BC_place, C_place
 
 ## 데이터프레임으로 변경
-def toDataframe(A, B, C, search_names):
-    df_A = pd.DataFrame(A, columns=['Long1','Lat1', search_names[0]])
-    df_B = pd.DataFrame(B, columns=['Long2','Lat2', search_names[1]])
-    df_C = pd.DataFrame(C, columns=['Long3','Lat3', search_names[2]])
+def toDataframe(A_place, B_place, C_place, search_names):
+    df_A = pd.DataFrame(A_place, columns=['Long1','Lat1', search_names[0]])
+    df_B = pd.DataFrame(B_place, columns=['Long2','Lat2', search_names[1]])
+    df_C = pd.DataFrame(C_place, columns=['Long3','Lat3', search_names[2]])
     df_ABC = pd.concat([df_A, df_B, df_C], axis = 1)
     df_ABC[['Long1', 'Long2', 'Long3', 'Lat1', 'Lat2', 'Lat3']] = df_ABC[['Long1', 'Long2', 'Long3', 'Lat1', 'Lat2', 'Lat3']].astype(np.float32)
     return df_ABC
     
 ## 세 지점의 중심좌표로 부터의 거리 계산
-def min_distance(ABC):
-    ABC['distance'] = np.nan
-    for index, i in ABC.iterrows():
+def min_distance(ABC_place):
+    ABC_place['distance'] = np.nan
+    for index, i in ABC_place.iterrows():
         long_center = (i['Long1'] + i['Long2']  + i['Long3'] )/3
         lat_center  = (i['Lat1'] + i['Lat2']  + i['Lat3'] )/3
         distance = np.max([((lat_center-i['Lat1'])**2 + (long_center-i['Long1'])**2)**(1/2),
                            ((lat_center-i['Lat2'])**2 + (long_center-i['Long2'])**2)**(1/2), 
                            ((lat_center-i['Lat3'])**2 + (long_center-i['Long3'])**2)**(1/2)])
-        ABC.loc[index, 'Long_center'] = long_center
-        ABC.loc[index, 'Lat_center'] = lat_center
-        ABC.loc[index, 'distance'] = distance
-    return ABC
+        ABC_place.loc[index, 'Long_center'] = long_center
+        ABC_place.loc[index, 'Lat_center'] = lat_center
+        ABC_place.loc[index, 'distance'] = distance
+    return ABC_place
 
 ## distance 기준으로 가장 가까운 지점 정렬 및 인덱스 초기화
-def nearest(ABC):
-    ABC_nearest = ABC.sort_values(by=['distance'],axis=0).reset_index(drop=True)
+def nearest(ABC_place):
+    ABC_nearest = ABC_place.sort_values(by=['distance'],axis=0).reset_index(drop=True)
     return ABC_nearest
 
 ## 기준 좌표 설정

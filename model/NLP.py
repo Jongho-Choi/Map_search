@@ -19,8 +19,8 @@ def import_model():
 def words2text(words, tokenizer, model):
     input_ids = tokenizer.encode(words)
     gen_ids = model.generate(torch.tensor([input_ids]),
-                            max_length=64,
-                            repetition_penalty=1.5,
+                            max_length=32,
+                            repetition_penalty=1.6,
                             pad_token_id=tokenizer.pad_token_id,
                             eos_token_id=tokenizer.eos_token_id,
                             bos_token_id=tokenizer.bos_token_id,
