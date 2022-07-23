@@ -4,7 +4,7 @@ import numpy as np
 from scipy import spatial
 import folium
 from folium import plugins
-import os, time
+import time
 
 ## Vworld맵에서 지역 정보 저장
 ## 각 장소별 특성 및 상태 반환
@@ -111,7 +111,7 @@ def std_map(df_top_5, zoom=12):
 def point2map(map, df_top_5, search_names, w3w_words, key_word_):
     html_t1 = "<h5>" +  "w3w /// " + w3w_words + "<h5>" + "<hr class='one'>"
     html_t2 = "<h5>" +  "이 장소의 대표 키워드는 "+ "<h5>"
-    html_t3 = "<h3>" +  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + key_word_ + "<h3>"
+    html_t3 = "<h3>" +  "&nbsp;&nbsp;" + key_word_ + "<h3>"
     html_t4 = "<h5>" +  """&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;입니다."""+ "<h5>"
     html = html_t1 + html_t2 + html_t3 + html_t4

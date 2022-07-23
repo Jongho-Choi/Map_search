@@ -11,6 +11,7 @@ importlib-metadata==4.12.0
 itsdangerous==2.1.2
 Jinja2==3.1.2
 JPype1==1.4.0
+konlpy==0.6.0
 lxml==4.9.1
 MarkupSafe==2.1.1
 numpy==1.21.6
@@ -36,3 +37,4 @@ wincertstore==0.2
 zipp==3.8.1
 gunicorn==19.9.0
 psutil==5.9.1
+PyKomoran==0.1.6.post1

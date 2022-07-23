@@ -1,49 +1,25 @@
-from flask import Flask, Blueprint, render_template, request
-import time, json, os
+from flask import Flask, render_template, request
 from model.Map_search import info, pages, total_position, small_num_of_places, find_nearest, toDataframe
 from model.Map_search import min_distance, nearest, std_map, point2map, draw_circle, mini_map
+from model.NLP import import_model, words2text, key_word, toText
 from model.w3w import to_w3w
-from model.NLP import import_model, words2text, key_word
-import folium
-import requests
-import pandas as pd
-import numpy as np
-
 from model.Auth import auth, w3w_auth
-
+from model.memory_check import memory_usage
+import gc
 app = Flask(__name__, static_url_path="/static")
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    lat = 37.566535
-    long = 126.97796919
-    zoom = 7.2
-    
-    return render_template('main.html', lat=lat, long=long, zoom=zoom),200
-
-@app.route('/about')
-def about():
-
-    return render_template('about.html'),200
-
-@app.route('/services')
-def services():
-
-    return render_template('services.html'),200
-
-@app.route('/contact')
-def contact():
-
-    return render_template('contact.html'),200
-
-@app.route('/thanks')
-def thanks():
-
-    return render_template('thankyou.html'),200
-
-@app.route('/position', methods=['GET', 'POST'])
-def map():
+    ## 메모리 사용량 확인용
+    memory_usage('start searching ...')
     try:
+        if request.method == 'GET':    
+            lat = 37.566535
+            long = 126.97796919
+            zoom = 7.2
+            
+            return render_template('main.html', lat=lat, long=long, zoom=zoom),200
+
         if request.method == 'POST':
             test = '여기닷!!'
             search_names = []
@@ -81,35 +57,31 @@ def map():
                 A_place, B_place, C_place, search_names = small_num_of_places(A_place, B_place, C_place, search_names)
                 A_place, B_place, C_place = find_nearest(A_place, B_place, C_place)
 
-                ## --> 문제없음
-
                 ## 데이터프레임으로 변경
                 ABC_place = toDataframe(A_place, B_place, C_place, search_names)
                 ## 세 지점의 중심좌표로 부터의 거리 계산
                 ABC_place = min_distance(ABC_place)
-                
-                ## --> 문제없음
-                
+                              
                 ## distance 기준으로 가장 가까운 지점 정렬 및 인덱스 초기화
                 ABC_nearest = nearest(ABC_place)
                 ## Top 5 선정
                 df_top_5 = ABC_nearest.head(5)
 
-                ## --> 문제없음
-
                 ## 좌표로 w3w 얻기
                 w3w_words = to_w3w(df_top_5, w3w_auth)
-                
-                ## --> 문제없음
 
-                ## words로 key_word 얻기
+                ## words로 문장 얻기
                 words = w3w_words.replace('.', ', ')
                 tokenizer, model = import_model()
-
-                ## --> 문제없음
-
-                generated = words2text(words, tokenizer, model)
-                key_word_ = key_word(generated)
+                generated = toText(words, tokenizer, model)
+                
+                ### 메모리 삭제
+                del tokenizer, model, ABC_nearest, ABC_place, A_place, B_place, C_place,
+                gc.collect()
+                memory_usage('sentence generating')
+                
+                # key_word_ = key_word(generated, words)
+                memory_usage('morpheme transformation')
 
                 ### !오류확인!
                 # if test == '여기닷!!':
@@ -118,16 +90,18 @@ def map():
                 ## 기준 좌표 설정
                 map = std_map(df_top_5)
                 ## 맵에 지역 포인팅
-                map = point2map(map, df_top_5, search_names, w3w_words, key_word_)
+                map = point2map(map, df_top_5, search_names, w3w_words, generated)
                 ## 3개 지역 binding
                 map = draw_circle(map, df_top_5)
                 ## 미니맵
                 map = mini_map(map)
                 ## folium 지도 object --> html
-                map=map._repr_html_()
+                map = map._repr_html_()
                 ## html 내용 수정 (map size 조절)
                 map = map[:37] + 'position: absolute;top: 0;bottom: 0;right: 0;left: 0;' + map[94:]
 
+                ## 잔여 메모리 삭제!
+                gc.collect()
                 return render_template('main2.html', place1=place1, place2=place2, place3=place3, map=map), 200
             else:
                 text_1 = ''
@@ -144,10 +118,29 @@ def map():
                 text = text_1 + ' ' + text_2 + ' ' + text_3
 
                 return render_template('error.html', text = text, place = ''), 400
-        if request.method == 'GET':    
-            return render_template('main2.html'), 200
-    except :    
-        return 'HTML을 불러올수 없습니다.', 400
+        
+    except Exception as e:    
+        return 'HTML을 불러올수 없습니다.' + e, 400
+
+@app.route('/about')
+def about():
+
+    return render_template('about.html'),200
+
+@app.route('/services')
+def services():
+
+    return render_template('services.html'),200
+
+@app.route('/contact')
+def contact():
+
+    return render_template('contact.html'),200
+
+@app.route('/thanks')
+def thanks():
+
+    return render_template('thankyou.html'),200
 
 if __name__ == '__main__':
     app.run(port=8080, debug=True)
