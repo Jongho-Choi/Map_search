@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request
 from model.Map_search import info, pages, total_position, small_num_of_places, find_nearest, toDataframe
 from model.Map_search import min_distance, nearest, std_map, point2map, draw_circle, mini_map
-from model.NLP import import_model, words2text, key_word, toText
+from model.NLP import import_model, words2text, toText#, key_word
 from model.w3w import to_w3w
-from model.Auth import auth, w3w_auth
 from model.memory_check import memory_usage
 import gc
+
 app = Flask(__name__, static_url_path="/static")
 
 @app.route('/', methods=['GET', 'POST'])
@@ -22,25 +22,21 @@ def index():
 
         if request.method == 'POST':
             test = '여기닷!!'
-            search_names = []
             if request.form['id_1'] and request.form['id_2'] and request.form['id_3']:
                 place1 = request.form['id_1']
                 place2 = request.form['id_2']
                 place3 = request.form['id_3']
 
                 search_names = [place1, place2, place3]
-                
-                key = auth
-                url = "https://api.vworld.kr/req/search"
-                search_names = [place1, place2, place3]
+
                 ## 각 장소별 특성 및 상태 반환
-                A_place, A_status = info(place1, key, url)
+                A_place, A_status = info(place1)
                 if A_status != 'OK':
                     return render_template('error.html', text = '', place = place1), 400
-                B_place, B_status = info(place2, key, url)
+                B_place, B_status = info(place2)
                 if B_status != 'OK':
                     return render_template('error.html', text = '', place = place2), 400
-                C_place, C_status = info(place3, key, url) ## 검색이 안될경우 status = 'NOT_FOUND'
+                C_place, C_status = info(place3) ## 검색이 안될경우 status = 'NOT_FOUND'
                 if C_status != 'OK':
                     return render_template('error.html', text = '', place = place3), 400
                 ## 페이지 반환
@@ -48,13 +44,14 @@ def index():
                 B_pages = pages(B_place)
                 C_pages = pages(C_place)
                 ## 모든 위치와 장소명 배열로 반환
-                A_place = total_position(place1, key, url, A_pages)
-                B_place = total_position(place2, key, url, B_pages)
-                C_place = total_position(place3, key, url, C_pages)
+                A_place = total_position(place1, A_pages)
+                B_place = total_position(place2, B_pages)
+                C_place = total_position(place3, C_pages)
                 ## 1. 제일 수가 적은 지역 찾고 
                 ## 2. A, B, C(제일 적은 수) 재배치
                 ## 3. C를 기준으로 가장 가까운 A,B 지역 탐색
                 A_place, B_place, C_place, search_names = small_num_of_places(A_place, B_place, C_place, search_names)
+                
                 A_place, B_place, C_place = find_nearest(A_place, B_place, C_place)
 
                 ## 데이터프레임으로 변경
@@ -68,19 +65,21 @@ def index():
                 df_top_5 = ABC_nearest.head(5)
 
                 ## 좌표로 w3w 얻기
-                w3w_words = to_w3w(df_top_5, w3w_auth)
+                w3w_words = to_w3w(df_top_5)
 
                 ## words로 문장 얻기
                 words = w3w_words.replace('.', ', ')
-                tokenizer, model = import_model()
-                generated = toText(words, tokenizer, model)
                 
+                tokenizer, model = import_model()
+                sentence = toText(words, tokenizer, model)
+                memory_usage('model generating')
                 ### 메모리 삭제
                 del tokenizer, model, ABC_nearest, ABC_place, A_place, B_place, C_place,
                 gc.collect()
                 memory_usage('sentence generating')
-                
-                # key_word_ = key_word(generated, words)
+
+                #key_word_ = key_word(sentence, words)
+
                 memory_usage('morpheme transformation')
 
                 ### !오류확인!
@@ -90,7 +89,7 @@ def index():
                 ## 기준 좌표 설정
                 map = std_map(df_top_5)
                 ## 맵에 지역 포인팅
-                map = point2map(map, df_top_5, search_names, w3w_words, generated)
+                map = point2map(map, df_top_5, search_names, w3w_words, sentence)
                 ## 3개 지역 binding
                 map = draw_circle(map, df_top_5)
                 ## 미니맵
@@ -101,6 +100,7 @@ def index():
                 map = map[:37] + 'position: absolute;top: 0;bottom: 0;right: 0;left: 0;' + map[94:]
 
                 ## 잔여 메모리 삭제!
+                del df_top_5, search_names, w3w_words, sentence, words
                 gc.collect()
                 return render_template('main2.html', place1=place1, place2=place2, place3=place3, map=map), 200
             else:

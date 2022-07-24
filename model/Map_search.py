@@ -4,11 +4,11 @@ import numpy as np
 from scipy import spatial
 import folium
 from folium import plugins
-import time
+from model.Auth import auth, url
 
 ## Vworld맵에서 지역 정보 저장
 ## 각 장소별 특성 및 상태 반환
-def info(name, key, url, size=1, page=1):
+def info(name, size=1, page=1):
     params = {'request' : 'search',
               'crs' : 'EPSG:4326)',
               'query' : name,
@@ -16,7 +16,7 @@ def info(name, key, url, size=1, page=1):
               'page' : page,
               'type' : 'place',
               'errorformat' : 'json',
-              'key' : key}
+              'key' : auth}
     results = requests.get(url, params=params).json()
     status = results['response']['status']
     return results, status
@@ -26,16 +26,15 @@ def pages(data):
     return int(data['response']['record']['total'])//1000 + 1
 
 ## 모든 위치와 장소명 배열로 반환
-def total_position(place, key, url, pages, size=1000):
+def total_position(place, pages, size=1000):
     data = np.empty((0,3), int)
     for i in range(1, pages+1):
-        places, _ = info(place, key, url, size, page=i)
+        places, _ = info(place, size, page=i)
         for j in range(len(places['response']['result']['items'])):
             title = places['response']['result']['items'][j]['title']
             x     = places['response']['result']['items'][j]['point']['x']
             y     = places['response']['result']['items'][j]['point']['y']
             data = np.append(data, [[x, y, title]], axis=0)
-        time.sleep(0.05)
     return data
 
 ## 1. 제일 수가 적은 지역 찾고 
@@ -108,17 +107,17 @@ def std_map(df_top_5, zoom=12):
     return map
 
 ## 맵에 지역 포인팅
-def point2map(map, df_top_5, search_names, w3w_words, key_word_):
-    html_t1 = "<h5>" +  "w3w /// " + w3w_words + "<h5>" + "<hr class='one'>"
-    html_t2 = "<h5>" +  "이 장소의 대표 키워드는 "+ "<h5>"
-    html_t3 = "<h3>" +  "&nbsp;&nbsp;" + key_word_ + "<h3>"
-    html_t4 = "<h5>" +  """&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;입니다."""+ "<h5>"
+def point2map(map, df_top_5, search_names, w3w_words, sentence):
+    html_t1 = "<h5>" +  "w3w /// " + w3w_words + "<h5>" + "<hr>"
+    html_t2 = "<h5>" +  "&nbsp;&nbsp;" + sentence[0] + "<h5>"
+    html_t3 = "<h5>" +  "&nbsp;&nbsp;" + sentence[1] + "<h5>"
+    html_t4 = "<h5>" +  "&nbsp;&nbsp;" + sentence[2] + "<h5>"
+    
     html = html_t1 + html_t2 + html_t3 + html_t4
-    iframe = folium.IFrame(html, width=220, height=200)
+    iframe = folium.IFrame(html, width=300, height=200)
     popup = folium.Popup(iframe)
 
-    folium.Marker([df_top_5['Lat_center'][0], df_top_5['Long_center'][0]], tooltip='키워드', popup = popup, icon=folium.Icon(icon = 'star', color = 'red')).add_to(map)
+    folium.Marker([df_top_5['Lat_center'][0], df_top_5['Long_center'][0]], tooltip='이 장소의 의미는?', popup = popup, icon=folium.Icon(icon = 'star', color = 'red')).add_to(map)
     for i in range(len(df_top_5)):
         for j in range(1,4):
             folium.Marker([df_top_5[f'Lat{j}'][i], df_top_5[f'Long{j}'][i]], tooltip=df_top_5[search_names[j-1]][i]).add_to(map)
@@ -127,11 +126,10 @@ def point2map(map, df_top_5, search_names, w3w_words, key_word_):
 ## 3개 지역 binding
 def draw_circle(map, df_top_5):
     for i in range(len(df_top_5)):
-        if df_top_5['distance'][i] < 0.01:
-            if i == 0:
+        if i == 0:
                 folium.Circle([df_top_5['Lat_center'][i],df_top_5['Long_center'][i]], radius = df_top_5['distance'][i]*100000, color = 'red', fill = 'red').add_to(map)
-            else :
-                folium.Circle([df_top_5['Lat_center'][i],df_top_5['Long_center'][i]], radius = df_top_5['distance'][i]*100000).add_to(map)
+        if df_top_5['distance'][i] < 0.015:
+            folium.Circle([df_top_5['Lat_center'][i],df_top_5['Long_center'][i]], radius = df_top_5['distance'][i]*100000).add_to(map)
     #os.remove('./flask_app/templates/position.html')
     #map.save('./flask_app/templates/position.html')
     # map.save('./flask_app/templates/position.html')
@@ -149,24 +147,22 @@ def mini_map(map):
 ## 보편적인 명칭은 검색수가 지나치게 많아 정확성이 낮아짐
 ## 고유 명칭일 수록 정확성 높아짐
 if __name__ == '__main__' :
-    import Auth
     ## 기본 정보
     place1, place2, place3 = '호구포역', '미니스톱', 'CGV'
-    key = Auth.auth
     url = "https://api.vworld.kr/req/search"
     search_names = [place1, place2, place3]
     ## 각 장소별 특성 및 상태 반환
-    A, A_status = info(place1, key, url)
-    B, B_status = info(place2, key, url)
-    C, C_status = info(place3, key, url) ## 검색이 안될경우 status = 'NOT_FOUND'
+    A, A_status = info(place1)
+    B, B_status = info(place2)
+    C, C_status = info(place3) ## 검색이 안될경우 status = 'NOT_FOUND'
     ## 페이지 반환
     A_pages = pages(A)
     B_pages = pages(B)
     C_pages = pages(C)
     ## 모든 위치와 장소명 배열로 반환
-    A = total_position(place1, key, url, A_pages)
-    B = total_position(place2, key, url, B_pages)
-    C = total_position(place3, key, url, C_pages)
+    A = total_position(place1, A_pages)
+    B = total_position(place2, B_pages)
+    C = total_position(place3, C_pages)
     ## 1. 제일 수가 적은 지역 찾고 
     ## 2. A, B, C(제일 적은 수) 재배치
     ## 3. C를 기준으로 가장 가까운 A,B 지역 탐색
