@@ -1,10 +1,15 @@
-import requests
+import requests, folium, concurrent
 import pandas as pd
 import numpy as np
 from scipy import spatial
-import folium
 from folium import plugins
 from model.Auth import auth, url
+
+## 지역 검색(알고리즘 상 3개의 지역만으로 한정 함)
+## 보편적인 명칭은 검색수가 지나치게 많아 정확성이 낮아짐
+## 고유 명칭일 수록 정확성 높아짐
+## Vworld 보다 Kakao map 정확도 높음
+## Kakao map 보다 Vworld가 검색 가능량이 많음
 
 ## Vworld맵에서 지역 정보 저장
 ## 각 장소별 특성 및 상태 반환
@@ -25,21 +30,75 @@ def info(name, size=1, page=1):
 def pages(data):
     return int(data['response']['record']['total'])//1000 + 1
 
-## 모든 위치와 장소명 배열로 반환
-def total_position(place, pages, size=1000):
+# ## 모든 위치와 장소명 배열로 반환
+# def total_position(place, pages, size=1000):
+#     data = np.empty((0,3), int)
+#     for i in range(1, pages+1):
+#         places, _ = info(place, size, page=i)
+#         for j in range(len(places['response']['result']['items'])):
+#             title = places['response']['result']['items'][j]['title']
+#             x     = places['response']['result']['items'][j]['point']['x']
+#             y     = places['response']['result']['items'][j]['point']['y']
+#             data = np.append(data, [[x, y, title]], axis=0)
+#     return data
+
+## API 호출
+def get_data(place, page, size = 1000):
+    places = [place] * page
+    size = [size] * page
+    pages = [i for i in range(1, page+1)]
+
+    temp = []
+    with concurrent.futures.ThreadPoolExecutor() as executor :
+        results = executor.map(info, places, size, pages)
+        for place in results:
+            temp.append(place)
+
+    return temp
+
+## 위치데이터 획득
+def get_position(place, page):
     data = np.empty((0,3), int)
-    for i in range(1, pages+1):
-        places, _ = info(place, size, page=i)
-        for j in range(len(places['response']['result']['items'])):
-            title = places['response']['result']['items'][j]['title']
-            x     = places['response']['result']['items'][j]['point']['x']
-            y     = places['response']['result']['items'][j]['point']['y']
+    if page == 1:
+        data = get_position2(place, 0, page)
+    elif page == 2:
+        start_page = [0, int(page/2)]
+        end_page = [int(page/2), page]
+        place2 = [place, place]
+    elif page == 3:
+        start_page = [0, int(page/3), int(page*2/3)]
+        end_page = [int(page/3), int(page*2/3), page]
+        place2 = [place, place, place]
+    elif page == 4:
+        start_page = [0, int(page/4), int(page*2/4), int(page*3/4)]
+        end_page = [int(page/4), int(page*2/4), int(page*3/4), page]
+        place2 = [place, place, place,place]
+    else :
+        start_page = [0, int(page/5), int(page*2/5), int(page*3/5), int(page*4/5)]
+        end_page = [int(page/5), int(page*2/5), int(page*3/5), int(page*4/5), page]
+        place2 = [place, place, place, place, place]
+    if page == 1:
+        pass
+    else :
+        with concurrent.futures.ThreadPoolExecutor() as executor :
+            results = executor.map(get_position2, place2, start_page, end_page)
+            for place in results:
+                data = np.append(data, place, axis = 0)
+
+    return data
+
+def get_position2(place, start_page, end_page):
+    data = np.empty((0,3), int)
+    for i in range(start_page, end_page):
+        for j in range(len(place[i][0]['response']['result']['items'])):
+            title = place[i][0]['response']['result']['items'][j]['title']
+            x     = place[i][0]['response']['result']['items'][j]['point']['x']
+            y     = place[i][0]['response']['result']['items'][j]['point']['y']
             data = np.append(data, [[x, y, title]], axis=0)
     return data
 
 ## 1. 제일 수가 적은 지역 찾고 
 ## 2. A, B, C(제일 적은 수) 재배치
-
 def small_num_of_places(A_place,B_place,C_place,search_names):
     len_a = len(A_place)
     len_b = len(B_place)
@@ -114,7 +173,7 @@ def point2map(map, df_top_5, search_names, w3w_words, sentence):
     html_t4 = "<h5>" +  "&nbsp;&nbsp;" + sentence[2] + "<h5>"
     
     html = html_t1 + html_t2 + html_t3 + html_t4
-    iframe = folium.IFrame(html, width=300, height=200)
+    iframe = folium.IFrame(html, width=290, height=180)
     popup = folium.Popup(iframe)
 
     folium.Marker([df_top_5['Lat_center'][0], df_top_5['Long_center'][0]], tooltip='이 장소의 의미는?', popup = popup, icon=folium.Icon(icon = 'star', color = 'red')).add_to(map)
@@ -127,12 +186,12 @@ def point2map(map, df_top_5, search_names, w3w_words, sentence):
 def draw_circle(map, df_top_5):
     for i in range(len(df_top_5)):
         if i == 0:
-                folium.Circle([df_top_5['Lat_center'][i],df_top_5['Long_center'][i]], radius = df_top_5['distance'][i]*100000, color = 'red', fill = 'red').add_to(map)
+            folium.Circle([df_top_5['Lat_center'][i],df_top_5['Long_center'][i]], radius = df_top_5['distance'][i]*120000, color = 'red', fill = 'red').add_to(map)
         if df_top_5['distance'][i] < 0.015:
-            folium.Circle([df_top_5['Lat_center'][i],df_top_5['Long_center'][i]], radius = df_top_5['distance'][i]*100000).add_to(map)
-    #os.remove('./flask_app/templates/position.html')
-    #map.save('./flask_app/templates/position.html')
+            folium.Circle([df_top_5['Lat_center'][i],df_top_5['Long_center'][i]], radius = df_top_5['distance'][i]*120000).add_to(map)
+    # os.remove('./flask_app/templates/position.html')
     # map.save('./flask_app/templates/position.html')
+
     return map 
 
 ## 미니맵 
@@ -141,13 +200,8 @@ def mini_map(map):
     map.add_child(minimap)
     return map
 
-## 지역 검색(알고리즘 상 3개의 지역만으로 한정 함)
-
-## 검색 지역 3개 예시
-## 보편적인 명칭은 검색수가 지나치게 많아 정확성이 낮아짐
-## 고유 명칭일 수록 정확성 높아짐
 if __name__ == '__main__' :
-    ## 기본 정보
+    ## 테스트
     place1, place2, place3 = '호구포역', '미니스톱', 'CGV'
     url = "https://api.vworld.kr/req/search"
     search_names = [place1, place2, place3]
@@ -160,10 +214,10 @@ if __name__ == '__main__' :
     B_pages = pages(B)
     C_pages = pages(C)
     ## 모든 위치와 장소명 배열로 반환
-    A = total_position(place1, A_pages)
-    B = total_position(place2, B_pages)
-    C = total_position(place3, C_pages)
-    ## 1. 제일 수가 적은 지역 찾고 
+    # A = total_position(place1, A_pages)
+    # B = total_position(place2, B_pages)
+    # C = total_position(place3, C_pages)
+    # ## 1. 제일 수가 적은 지역 찾고 
     ## 2. A, B, C(제일 적은 수) 재배치
     ## 3. C를 기준으로 가장 가까운 A,B 지역 탐색
     A, B, C, search_names = small_num_of_places(A, B, C, search_names)
