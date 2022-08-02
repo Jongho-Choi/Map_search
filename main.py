@@ -5,7 +5,8 @@ from model.NLP import import_model, toText
 from model.w3w import to_w3w
 from model.memory_check import memory_usage
 import gc, concurrent.futures, time
-
+import os
+from flask import send_from_directory
 app = Flask(__name__, static_url_path="/static")
 
 @app.route('/', methods=['GET', 'POST'])
@@ -36,6 +37,7 @@ def index():
                     for result in results:
                         temp.append(result)
 
+                ## 검색이 안될경우 에러
                 A_place, A_status = temp[0]
                 if A_status != 'OK':
                     return render_template('error.html', text = '', place = place1), 400
@@ -46,12 +48,19 @@ def index():
                 if C_status != 'OK':
                     return render_template('error.html', text = '', place = place3), 400
 
-                ## 페이지 반환
+                ## 페이지 반환 & 검색수가 많을 경우 에러
                 A_pages = pages(A_place)
+                if A_pages > 30:
+                    return render_template('error.html', text = '', place = '', place2 = place1), 400
                 B_pages = pages(B_place)
+                if B_pages > 30:
+                    return render_template('error.html', text = '', place = '', place2 = place2), 400
                 C_pages = pages(C_place)
+                if C_pages > 30:
+                    return render_template('error.html', text = '', place = '', place2 = place3), 400
                 places = [place1, place2, place3]
                 ABC_page = [A_pages, B_pages, C_pages]
+
                 start = time.perf_counter()
                 A_place = get_data(places[0], ABC_page[0])
                 B_place = get_data(places[1], ABC_page[1])
@@ -144,6 +153,12 @@ def index():
     except Exception as e:    
         return 'HTML을 불러올수 없습니다.' + e, 400
 
+@app.route('/favicon.ico')
+def favicon():
+    print(os.path.join(app.root_path, 'static'))
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico')
+                               
 @app.route('/about')
 def about():
 
