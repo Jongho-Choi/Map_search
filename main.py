@@ -5,14 +5,14 @@ from model.NLP import import_model, toText
 from model.w3w import to_w3w
 from model.memory_check import memory_usage
 import gc, concurrent.futures, time
-import os
-from flask import send_from_directory
+
 app = Flask(__name__, static_url_path="/static")
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     ## 메모리 사용량 확인용
     memory_usage('start ...')
+
     try:
         if request.method == 'GET':    
             lat = 37.566535
@@ -153,12 +153,6 @@ def index():
     except Exception as e:    
         return 'HTML을 불러올수 없습니다.' + e, 400
 
-@app.route('/favicon.ico')
-def favicon():
-    print(os.path.join(app.root_path, 'static'))
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico')
-                               
 @app.route('/about')
 def about():
 
